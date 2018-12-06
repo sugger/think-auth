@@ -1,0 +1,22 @@
+{
+    "name": "sugger/think-auth",
+    "description": "thinkphp权限拓展",
+    "require": {
+        "topthink/framework": "^5.0"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "lei",
+            "email": "295729766@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "sugger\\thinkAuth\\": "src"
+        },
+        "files": [
+            "src/common.php"
+        ]
+    }
+}
