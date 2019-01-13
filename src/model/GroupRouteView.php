@@ -14,7 +14,9 @@ class GroupRouteView extends Model
 {
 
 	protected $type = [
-		'show_fields'=>'json'
+		'show_fields'=>'json',
+		'data_scope'=>'json',
+		'data_route_access'=>'json',
 	];
 
 

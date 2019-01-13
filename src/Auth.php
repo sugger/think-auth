@@ -17,7 +17,6 @@ class Auth
 	protected static $_user_id;
 	protected static $_user_group;
 	protected static $_user_extra = [];
-	protected static $instance;
 
 
 
@@ -71,7 +70,7 @@ class Auth
 	/**
 	 * 创建人：王磊
 	 * 创建时间：2018/12/11 下午5:13
-	 * 描述：获取用户组数据集
+	 * 描述：获取用户所有的组据集
 	 *
 	 * @return false|\PDOStatement|string|\think\Collection
 	 * @throws \think\db\exception\DataNotFoundException
@@ -95,7 +94,7 @@ class Auth
 	 * @throws \think\exception\DbException
 	 */
 	public static function getUserGroupId(){
-		return static::getUserGroupCollection()->column('group_id');
+		return array_column(static::getUserGroupCollection()->toArray(),'group_id');
 	}
 
 	/**
@@ -237,6 +236,7 @@ class Auth
 				$data_act[] = $all_act[$url];
 		}
 		$return = [];
+
 		foreach ($data_act as $more_access){
 			foreach ($more_access as $one_access){
 				if (empty($one_access['data_route_access']) || self::checkDataHasAct($data,$one_access['data_route_access'])){
@@ -257,23 +257,21 @@ class Auth
 	 * @param $data_route_access
 	 */
 	public static function checkDataHasAct($data,$data_route_access){
-		$data_route_access = [
-			[
-				'KEY'=>'username',
-				'RETURN_TYPE'=>'1',//符合条件1，不符合条件0
-				'VALIDATE_TYPE'=>'VALUE',//验证类型，值验证：VALUE，类验证: ['class_name','method']
-				'VALUE' => '',// "%组权限表里的拓展字段%"
-				'CLASS' => ['CLASS_A','METHOD_A'],// "%组权限表里的拓展字段%"
-			],
-			[
-				'KEY'=>'password',
-				'RETURN_TYPE'=>'1',//符合条件1，不符合条件0
-				'VALIDATE_TYPE'=>'VALUE',//验证类型，值验证：VALUE，类验证: ['class_name','method']
-				'VALUE' => '',// "%组权限表里的拓展字段%"
-				'CLASS' => ['CLASS_A','METHOD_A'],// "%组权限表里的拓展字段%"
-			],
-		];
-		$extend = self::isLogin()?self::getAllExtra():false;
+
+		$extend = self::isLogin()?self::getAllExtra():[];
+		foreach ($data_route_access as $access){
+			if ($access['VALIDATE_TYPE'] === 'VALUE'){
+				$res = $data[$access['KEY']] == $access['VALUE'];
+			}elseif ($access['VALIDATE_TYPE'] === 'FUNCTION'){
+				$res = $access['VALUE']($data,$extend,self::$_user);
+			}elseif ($access['VALIDATE_TYPE'] === 'CLASS'){
+				$res = call_user_func($access['VALUE'],$data,$extend,self::$_user);
+			}
+			if (($access['RETURN_TYPE'] == 1 && $res === false) || ($access['RETURN_TYPE'] == 0 && $res === true)){
+				return false;
+			}
+		}
+		return true;
 
 
 	}
