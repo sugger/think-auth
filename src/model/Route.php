@@ -11,6 +11,8 @@ use sugger\thinkAuth\Model;
 
 class Route extends Model
 {
+	protected $table = 'auth_route';
+
 	protected $type = [
 		'show_fields'=>'json'
 	];

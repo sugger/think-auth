@@ -11,6 +11,7 @@ use sugger\thinkAuth\Model;
 
 class Table extends Model
 {
+	protected $table = 'auth_table';
 	protected $type = [
 		'fields'      =>  'json',
 	];

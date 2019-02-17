@@ -12,6 +12,8 @@ use think\Cache;
 
 class ModelAct extends Model
 {
+	protected $table = 'auth_model_act';
+
 	protected $type = [
 		'model_act'=>'json'
 	];

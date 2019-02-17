@@ -13,6 +13,8 @@ use think\Cache;
 class RoleRouteView extends Model
 {
 
+	protected $table = 'auth_role_route_view';
+
 	protected $type = [
 		'show_fields'=>'json',
 		'data_scope'=>'json',

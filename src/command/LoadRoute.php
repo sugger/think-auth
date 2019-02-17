@@ -39,17 +39,18 @@ class LoadRoute extends Command
 		foreach ($api_data as $module_name=>$module_data){
 			$model_db_data = ['module'=>$module_name,'route_level'=>'1'];
 			$module_id =   $model->where($model_db_data)->value('route_id');
+
 			if (empty($module_id)){
-				$model->isUpdate(false)->data($model_db_data)->save();
-				$module_id = $model->route_id;
+				$model->isUpdate(false)->insert($model_db_data);
+				$module_id = $model->getLastInsID();
 			}
 
 			foreach ($module_data as $controller_name=>$controller_data){
 				$controller_db_data = array_merge($model_db_data,['controller'=>$controller_name,'pid'=>$module_id,'route_level'=>'2']);
 				$controller_id =   $model->where($controller_db_data)->value('route_id');
 				if (empty($controller_id)){
-					$model->isUpdate(false)->data($controller_db_data)->save();
-					$controller_id = $model->route_id;
+					$model->isUpdate(false)->save($controller_db_data);
+					$controller_id = $model->getLastInsID();
 				}
 
 				foreach ($controller_data as $action_name=>$api_name){
@@ -57,14 +58,13 @@ class LoadRoute extends Command
 						'action'=>$action_name,
 						'pid'=>$controller_id,
 						'route_name'=>$api_name,
-						'route_url'=>strtolower("$module_name/$controller_name/$action_name"),
+						'route_url'=>"$module_name/$controller_name/$action_name",
 						'route_level'=>'3'
 					]);
 					$action_id =   $model->where(['route_url'=>$action_data['route_url']])->value('route_id');
 					if (empty($action_id)){
-						$model->isUpdate(false)->data($action_data)->save();
+						$model->isUpdate(false)->insert($action_data);
 					}
-
 				}
 			}
 		}
